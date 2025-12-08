@@ -1,0 +1,7 @@
+create_table("documents") {
+    column("id", "serial", primary: true)
+    column("text", "text")
+    column("vector", "vector", size: 32)
+    column("project_name", "text")
+    column("description", "text")
+}
