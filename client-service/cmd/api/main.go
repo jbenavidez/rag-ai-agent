@@ -25,10 +25,6 @@ func main() {
 	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
 	fmt.Println("client up and running")
 
-	// text := "Hello Postgres Vector"
-	// embedding := simpleEmbedding(text)
-	// fmt.Println("the text valinor", embedding)
-
 	err := app.LoadCSVAndInsert()
 	if err != nil {
 		fmt.Println("sotmhthing break", err)
