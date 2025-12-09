@@ -1,6 +1,5 @@
 FROM python:3.10-slim
 
-
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -11,10 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir torch sentence-transformers flask
+# Do NOT upgrade pip. It breaks under buildx.
+RUN pip install --no-cache-dir \
+        torch==2.9.1 \
+        sentence-transformers \
+        flask
 
 COPY app.py .
-
 
 EXPOSE 8000
 
