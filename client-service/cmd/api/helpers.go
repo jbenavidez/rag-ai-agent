@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (c *Config) LoadCSVAndInsert() error {
+func (c *Config) LoadData() error {
 	totalDocs, err := c.DB.GetTotalDocuments()
 	if err != nil {
 		return err

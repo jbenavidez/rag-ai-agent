@@ -25,11 +25,18 @@ func main() {
 	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
 	fmt.Println("client up and running")
 
-	err := app.LoadCSVAndInsert()
+	err := app.LoadData()
 	if err != nil {
 		fmt.Println("sotmhthing break", err)
 	}
 	log.Println("Starting agent on port", port)
+
+	_, err = app.DB.GetEmbeddingDocument("valinor", 3)
+
+	if err != nil {
+		fmt.Println("valinor_faild", err)
+		panic(err)
+	}
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), app.routes())
 	if err != nil {

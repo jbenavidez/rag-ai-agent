@@ -86,3 +86,35 @@ func (m *PostgresDBRepo) InsertDocument(documents []models.Document) error {
 	fmt.Println("valinor data inserted succefully")
 	return nil
 }
+
+func (m *PostgresDBRepo) GetEmbeddingDocument(queryText string, topK int) ([]models.Document, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+	queryVector := utils.SimpleEmbedding(queryText)
+
+	stmt := `
+		SELECT text,  vector <-> $1 AS distance
+		FROM documents
+		ORDER BY vector <-> $1
+		LIMIT $2
+	`
+	rows, err := m.DB.QueryContext(ctx, stmt, toPGVector(queryVector), topK)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var documents []models.Document
+	for rows.Next() {
+		var doc models.Document
+		err := rows.Scan(
+			&doc.Text,
+			&doc.Distance,
+		)
+		if err != nil {
+			return nil, err
+		}
+		documents = append(documents, doc)
+	}
+	fmt.Println("getting the result", len((documents)))
+	return documents, nil
+}
