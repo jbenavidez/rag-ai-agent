@@ -14,7 +14,8 @@ services:
       replicas: 1
     environment:
       DSN: "host=postgres port=5432 user=postgres password=postgres dbname=ai_agent sslmode=disable timezone=UTC connect_timeout=5"
-
+    depends_on:
+      - embedding-service
 
   postgres:
     image: ramsrib/pgvector:14
@@ -32,5 +33,18 @@ services:
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
       - ./db-init:/docker-entrypoint-initdb.d/
-
  
+  embedding-service:
+    build:
+      context: ./../embedding-service     # <-- folder containing app.py + Dockerfile
+      dockerfile:  ./../embedding-service/embedding-service.dockerfile           # <-- name of the Dockerfile you created
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_NAME: "all-MiniLM-L6-v2"   # optional, if you want env config later
+    depends_on:
+      - postgres
