@@ -8,7 +8,10 @@ import (
 	"net/http"
 )
 
-const port = 8080
+const (
+	gRpcPort = "50001"
+	port     = 8080
+)
 
 type Config struct {
 	DB repository.DatabaseRepo
@@ -37,6 +40,7 @@ func main() {
 		fmt.Println("valinor_faild", err)
 		panic(err)
 	}
+	// set up Grpc connection
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), app.routes())
 	if err != nil {
