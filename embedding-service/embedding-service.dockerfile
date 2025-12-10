@@ -1,8 +1,8 @@
 FROM python:3.11-slim
 
-
 WORKDIR /app
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         git \
@@ -14,23 +14,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Upgrade pip
 RUN python -m pip install --upgrade pip --no-cache-dir --disable-pip-version-check
 
+# Install Python dependencies
 RUN python -m pip install --no-cache-dir \
         fastembed==0.6.0 \
-        flask \
         grpcio \
         grpcio-tools \
         protobuf \
     --disable-pip-version-check
 
+# Copy source code
 COPY . .
-ENV PYTHONPATH=/app
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=development
-ENV FLASK_DEBUG=1
+
+# Set Python path
 ENV PYTHONPATH=/app
 
+# Expose gRPC port
+EXPOSE 50001
 
-EXPOSE 8000 50051 50052
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8000", "--reload"]
+# Start gRPC server
+CMD ["python", "app.py"]

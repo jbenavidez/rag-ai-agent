@@ -42,7 +42,10 @@ func main() {
 		fmt.Println("valinor_faild", err)
 		panic(err)
 	}
-
+	// connect to GRPC
+	app.GRPCClient = connectGRPC()
+	fmt.Println("GRPC is conencted")
+	NewGrpcHelper(&app)
 	//
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), app.routes())
 	if err != nil {

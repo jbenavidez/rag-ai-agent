@@ -2,6 +2,7 @@ package main
 
 import (
 	"client/models"
+	pb "client/proto/generated"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -69,11 +70,24 @@ func (c *Config) LoadData() error {
 }
 
 func (app *Config) TestEndpoint(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
-	resp["status"] = "ok"
-	resp["message"] = "GONDORR here"
+
+	//test GRPC connection
+	//set request
+	req := &pb.EmbeddingsMessageRequest{
+		Text: "hello there",
+	}
+	resp, err := app.GRPCClient.TextToEmbedding(r.Context(), req)
+
+	if err != nil {
+		fmt.Println("unable to calle GRP", err)
+		return
+	}
+
+	jsonResponse := make(map[string]string)
+	jsonResponse["status"] = "ok"
+	jsonResponse["message"] = resp.Text
 	//set response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(jsonResponse)
 
 }

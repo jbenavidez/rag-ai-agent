@@ -1,8 +1,4 @@
 services:
-
-
- 
-
   client-service:
     build:
       context: ./../client-service
@@ -37,14 +33,14 @@ services:
  
   embedding-service:
     build:
-      context: ./../embedding-service 
-      dockerfile:  ./../embedding-service/embedding-service.dockerfile
+      context: ./../embedding-service
+      dockerfile: ./../embedding-service/embedding-service.dockerfile
     restart: always
     deploy:
       mode: replicated
       replicas: 1
     ports:
-      - "8000:8000"
+      - "50001:50001"
     environment:
       MODEL_NAME: "all-MiniLM-L6-v2"
     depends_on:
