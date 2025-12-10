@@ -1,10 +1,8 @@
-# app.py
-
-import threading
+ import threading
 from flask import Flask, request, jsonify
 
 from fastembed import TextEmbedding
-from grpc_server import start_grpc_server   # Import gRPC server starter
+from grpc_server import start_grpc_serve 
 
 
 # Load FastEmbed 
@@ -17,7 +15,7 @@ app = Flask(__name__)
 def root():
     return jsonify({
         "status": "running",
-        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "model": "Welcome to gondor3",
         "grpc_port": 50051
     })
 
@@ -36,7 +34,7 @@ def embed():
     embeddings = vectors.tolist() if hasattr(vectors, "tolist") else vectors
 
     return jsonify({
-        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "model": "sentence-transformerads2",
         "count": len(embeddings),
         "embeddings": embeddings
     })

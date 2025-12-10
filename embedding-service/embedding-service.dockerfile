@@ -25,10 +25,12 @@ RUN python -m pip install --no-cache-dir \
     --disable-pip-version-check
 
 COPY . .
-
+ENV PYTHONPATH=/app
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
 ENV PYTHONPATH=/app
 
 
 EXPOSE 8000 50051 50052
-
-CMD ["python", "app.py"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8000", "--reload"]

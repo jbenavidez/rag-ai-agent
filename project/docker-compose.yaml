@@ -48,3 +48,5 @@ services:
       MODEL_NAME: "all-MiniLM-L6-v2"
     depends_on:
       - postgres
+    volumes:
+      - "../embedding-service:/app"
