@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func connectGRPC() pb.EmbeddingServiceClient {
+func newGRPCConn() pb.EmbeddingServiceClient {
 	var conn *grpc.ClientConn
 	var err error
 

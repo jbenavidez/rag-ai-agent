@@ -12,9 +12,15 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
+const timeOut = time.Second * 3
+
 func (c *Config) LoadData() error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	defer cancel()
+
 	totalDocs, err := c.DB.GetTotalDocuments()
 	if err != nil {
 		return err
@@ -45,10 +51,15 @@ func (c *Config) LoadData() error {
 		description := row[2]
 		text := strings.TrimSpace(fmt.Sprintf("%s — %s", projectcName, description))
 		fmt.Println("gondor", text)
+		embedingText, err := app.TextToEmbedding(ctx, text)
+		if err != nil {
+			return err
+		}
 		doc := models.Document{
-			Text:        text,
-			ProjectName: projectcName,
-			Description: description,
+			Text:          text,
+			EmbeddingText: embedingText,
+			ProjectName:   projectcName,
+			Description:   description,
 		}
 		batch = append(batch, doc)
 
@@ -94,20 +105,21 @@ func (app *Config) TestEndpoint(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *Config) TextToEmbedding(ctx context.Context, text string) ([]float64, error) {
+func (app *Config) TextToEmbedding(ctx context.Context, text string) (string, error) {
 	// set req for grpc service
 	if len(text) == 0 {
-		return nil, errors.New("text cant be empty")
+		return "nil", errors.New("text cant be empty")
 	}
+	fmt.Println("the_text_to_process", text)
 	req := &pb.EmbeddingsMessageRequest{
-		Text: text,
+		Text: "hello there",
 	}
 	resp, err := app.GRPCClient.TextToEmbedding(ctx, req)
 	if err != nil {
 		fmt.Println("unable to calle GRP", err)
-		return nil, err
+		return "nil", err
 	}
-	_ = resp
-	return nil, nil
+
+	return resp.Text, nil
 
 }

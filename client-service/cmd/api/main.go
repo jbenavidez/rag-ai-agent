@@ -25,28 +25,29 @@ func main() {
 
 	conn := app.connectToDB()
 	if conn == nil {
-		log.Panic("Can't connect to Postgres!")
+		log.Panic("Cannot connect to Postgres!")
 	}
 	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
 	fmt.Println("client up and running")
 
+	// connect to GRPC
+	app.GRPCClient = newGRPCConn()
+	fmt.Println("GRPC is conencted")
+	// init helper
+	NewGrpcHelper(&app)
+	// load data
 	err := app.LoadData()
 	if err != nil {
-		fmt.Println("sotmhthing break", err)
+		fmt.Println("somethings break", err)
 	}
-	log.Println("Starting agent on port", port)
 
 	_, err = app.DB.GetEmbeddingDocument("valinor", 3)
 
 	if err != nil {
-		fmt.Println("valinor_faild", err)
+		fmt.Println("failed_test", err)
 		panic(err)
 	}
-	// connect to GRPC
-	app.GRPCClient = connectGRPC()
-	fmt.Println("GRPC is conencted")
-	NewGrpcHelper(&app)
-	//
+	log.Println("Starting agent on port", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), app.routes())
 	if err != nil {
 		log.Fatal(err)
