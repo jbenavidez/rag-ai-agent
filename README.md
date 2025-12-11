@@ -5,7 +5,7 @@ A lightweight RAG-based AI agent that ingests content from the NYC Capital proje
 *   **Go**:  High-performance backend powering core microservices.
 *   **Python**: processing and embedding generation.
 *   **gRPC**: Fast, type-safe communication between services.
-*   **PostgreSQL + pgvector**: Cector-enabled database for similarity search..
+*   **PostgreSQL + pgvector**: Vector-enabled database for similarity search..
  
 
  ## Micro-services descriptions
