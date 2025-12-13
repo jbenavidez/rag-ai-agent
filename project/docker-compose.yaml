@@ -2,10 +2,10 @@
 
 services:
 
-  client-service:
+  rag-service:
     build:
-      context: ./../client-service
-      dockerfile: ./../client-service/client-service.dockerfile
+      context: ./../rag-service
+      dockerfile: ./../rag-service/rag-service.dockerfile
     restart: always
     ports:
       - "4000:4000"

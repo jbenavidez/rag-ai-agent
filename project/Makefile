@@ -1,5 +1,4 @@
-CLIENT_SERVICE=clientApp
-
+RAG_SERVICE=RagAgent
 
 up_build:  build_client
 	@echo "Stopping docker images (if running...)"
@@ -11,5 +10,5 @@ up_build:  build_client
 
 build_client:
 	@echo "Building client  binary..."
-	cd ../client-service && env GOOS=linux CGO_ENABLED=0 go build -o ${CLIENT_SERVICE} ./cmd/api
+	cd ../rag-service && env GOOS=linux CGO_ENABLED=0 go build -o ${RAG_SERVICE} ./cmd/api
 	@echo "Done!"
