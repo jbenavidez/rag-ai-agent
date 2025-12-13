@@ -22,42 +22,18 @@ func (m *WeaviateDBRepo) Connection() *weaviate.Client {
 }
 
 func (m *WeaviateDBRepo) GetTotalDocs() (int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	query := fmt.Sprintf(`
-        {
-            Get {
-                %s {
-                    _id
-                }
-            }
-        }
-    `, className)
-
-	res, err := m.DB.GraphQL().Raw().WithQuery(query).Do(ctx)
+	res, err := m.DB.Data().ObjectsGetter().
+		WithClassName(className).
+		WithLimit(10000).
+		Do(ctx)
 	if err != nil {
 		return 0, fmt.Errorf("error fetching documents: %w", err)
 	}
 
-	// if no data is returned, we assume there are no documents
-	if res.Data == nil {
-		return 0, nil
-	}
-
-	// get data and check if docs exist
-	classData, ok := res.Data["Get"].(map[string]interface{})
-	if !ok {
-		return 0, fmt.Errorf("unexpected data format")
-	}
-
-	// get docs
-	documents, exists := classData[className].([]interface{})
-	if !exists {
-		return 0, nil
-	}
-
-	return len(documents), nil
+	return len(res), nil
 }
 
 func (m *WeaviateDBRepo) InsertDocument(doc *models.Doc) error {

@@ -1,4 +1,7 @@
+
+
 services:
+
   client-service:
     build:
       context: ./../client-service
@@ -13,7 +16,7 @@ services:
       DSN: "host=postgres port=5432 user=postgres password=postgres dbname=ai_agent sslmode=disable timezone=UTC connect_timeout=5"
     depends_on:
       - embedding-service
-
+      - weaviate
 
   embedding-service:
     build:
@@ -32,7 +35,6 @@ services:
     volumes:
       - "../embedding-service:/app"
 
-
   postgres:
     image: ramsrib/pgvector:14
     restart: always
@@ -50,15 +52,41 @@ services:
       - ./db-data/postgres/:/var/lib/postgresql/data/
       - ./db-init:/docker-entrypoint-initdb.d/
 
-
   ollama-service:
     image: ollama/ollama:latest
     restart: always
     ports:
-      - "8080:8080" 
+      - "11434:11434"
     environment:
-      OLLAMA_API_KEY: ""   
+      OLLAMA_API_KEY: ""
     volumes:
       - ./ollama-data:/ollama-data
     depends_on:
-      - postgres 
+      - postgres
+
+
+
+  weaviate:
+    image: semitechnologies/weaviate:1.19.0
+    container_name: weaviate
+    hostname: weaviate
+    ports:
+      - "8080:8080"
+
+    environment:
+      QUERY_DEFAULTS_LIMIT: 20
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+
+      DEFAULT_VECTORIZER_MODULE: "text2vec-openai"
+      ENABLE_MODULES: "text2vec-openai"
+      OPENAI_EMBEDDING_MODEL: "text-embedding-3-small"
+ 
+      UUID_ALLOW_NON_UUID: "true"
+
+      # 🔑 CRITICAL FIX
+      CLUSTER_HOSTNAME: "weaviate"
+      CLUSTER_JOIN: ""
+ 
+    volumes:
+      - ./weaviate_data:/var/lib/weaviate
