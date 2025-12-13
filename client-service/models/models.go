@@ -7,3 +7,10 @@ type Document struct {
 	Description   string
 	Distance      float64
 }
+
+type Doc struct {
+	ID          string
+	Text        string
+	ProjectName string
+	Description string
+}
