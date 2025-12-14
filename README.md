@@ -4,7 +4,7 @@ A lightweight RAG-based AI agent that ingests content from the NYC Capital proje
  ## Stack
 *   **Go** 
 *   **Weaviate** 
- 
+*   **GRPC** 
 
  ## Micro-Services descriptions
 *   **RAG-service**: A service built in Go responsible for handling Retrieval-Augmented Generation (RAG) operations. It manages incoming requests, communicates with the embedding service, and performs queries to the vector database. The service relies on Weaviate to retrieve relevant embeddings for generating context-aware responses.
