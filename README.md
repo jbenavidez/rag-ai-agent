@@ -28,3 +28,46 @@ The agent’s knowledge comes from  data.cityofnewyork.us, with data currently i
 **Answer:**  
 1. Manhattan  
 2. The Bronx
+
+ ## Setup and Running the Project
+### 1. Start services
+
+Start all services using Docker Compose:
+
+```bash
+docker-compose up
+```
+
+### 2. Access the ClI(wip)
+
+SSH into the CLI container::
+
+```bash
+docker exec -it project-cli-service-1 /bin/sh
+
+```
+You will see a shell prompt inside the container:
+```bash
+/ #
+```
+
+Start the CLI service inside the container:
+```bash
+/app/CliService
+
+```
+You will see a welcome message:
+
+```bash
+Welcome to the NYC Capital Project RAG AI CLI
+Ask any question related to NYC capital projects from 2023-2025.
+The AI agent will provide answers based on the data provided by data.cityofnewyork.us
+Type your question and press Enter. Type 'exit' to quit.
+```
+
+Type your question and press Enter. Example:
+```bash
+Which boroughs have interceptor sewer projects?
+```
+
+ Display response( still on progress..)
