@@ -11,7 +11,7 @@ up_build:  build_rag_agent build_frontend
 
 build_rag_agent:
 	@echo "Building RAG IA Agent  binary..."
-	cd ../rag-service && env GOOS=linux CGO_ENABLED=0 go build -o ${RAG_SERVICE} ./cmd/api
+	cd ../rag-ai-agent && env GOOS=linux CGO_ENABLED=0 go build -o ${RAG_SERVICE} ./cmd/api
 	@echo "Done!"
 
 

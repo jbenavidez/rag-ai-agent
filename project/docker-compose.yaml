@@ -2,10 +2,10 @@
 
 services:
 
-  rag-service:
+  rag-ai-agent-service:
     build:
-      context: ./../rag-service
-      dockerfile: ./../rag-service/rag-service.dockerfile
+      context: ./../rag-ai-agent
+      dockerfile: ./../rag-ai-agent/rag-ai-agent.dockerfile
     restart: always
     deploy:
       mode: replicated
@@ -22,7 +22,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - rag-service
+      - rag-ai-agent-service
       - ollama-service
 
 

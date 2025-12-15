@@ -21,7 +21,7 @@ var app config.AppConfig
 func main() {
 	//set grpc client
 
-	conn, err := grpc.Dial("rag-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	conn, err := grpc.Dial("rag-ai-agent-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		fmt.Println("unable to connected to grpc server")
 		panic(err)
@@ -29,7 +29,7 @@ func main() {
 	client := pb.NewAIAgentServiceClient(conn)
 	app.GRPCClient = client
 
-	//init web
+	// //init web
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 	render.NewRenderer(&app)
