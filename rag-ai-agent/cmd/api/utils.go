@@ -128,7 +128,6 @@ func (c *RagConfig) GenerateAnswerFromSlides(ctx context.Context, question strin
 		"Answer the user's question concisely, professionally, and in a friendly manner using the project information below. "+
 			"Do NOT mention the data source or any JSON/slides. "+
 			"Number items if there are multiple. "+
-			"Optionally suggest one or two helpful follow-up questions.\n\n"+
 			"Project Data:\n%s\n\nQuestion: %s\nAnswer:",
 		slidesJSON, question,
 	)
