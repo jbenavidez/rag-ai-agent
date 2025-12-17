@@ -5,7 +5,17 @@ import (
 	"errors"
 	"io"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
+
+var upgradeConnection = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func (m *Repository) readJSON(w http.ResponseWriter, r *http.Request, data any) error {
 

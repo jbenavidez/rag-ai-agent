@@ -77,3 +77,7 @@ func (m *Repository) AnswerUserQuestion(w http.ResponseWriter, r *http.Request) 
 	_ = m.writeJSON(w, http.StatusOK, resp)
 
 }
+
+func (m *Repository) WsChatRoom(w http.ResponseWriter, r *http.Request) {
+
+}
