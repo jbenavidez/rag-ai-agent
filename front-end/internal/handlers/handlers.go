@@ -11,6 +11,7 @@ import (
 )
 
 var wsChan = make(chan WsMessage)
+var clients = make(map[*WebSocketConnection][]string)
 
 type Repository struct {
 	App *config.AppConfig
@@ -91,7 +92,7 @@ func (m *Repository) WsChatRoom(w http.ResponseWriter, r *http.Request) {
 	//set ws res
 	var response WsJsonResponse
 	response.Message = `<em><small> connected to served</small></em>`
-	conn := WebSocketConnection{Conn: ws}
+	conn := &WebSocketConnection{Conn: ws}
 
 	err = ws.WriteJSON(response)
 	if err != nil {
@@ -100,5 +101,5 @@ func (m *Repository) WsChatRoom(w http.ResponseWriter, r *http.Request) {
 	//
 	log.Println("cconnected success ")
 
-	go ListenForWs(&conn) // start go runtine to listen Ws
+	go ListenForWs(conn) // start go runtine to listen Ws
 }
