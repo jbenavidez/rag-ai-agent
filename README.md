@@ -33,7 +33,7 @@ The agent’s knowledge comes from   **data.cityofnewyork.us**, with data curren
  ## Setup and Running the Project
 ### 1. Start services
 
-Start all services using Docker Compose:
+Start all services using Docker Compose --> from the project folder, run the following command:
 
 ```bash
 make up_build

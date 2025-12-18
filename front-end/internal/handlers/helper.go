@@ -2,8 +2,15 @@ package handlers
 
 import (
 	"fmt"
+	"frontend/internal/config"
 	"log"
 )
+
+var app *config.AppConfig
+
+func NewHelpers(a *config.AppConfig) {
+	app = a
+}
 
 type WsPayload struct {
 	Action  string `json:"action"`

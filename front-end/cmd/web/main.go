@@ -30,10 +30,12 @@ func main() {
 	client := pb.NewAIAgentServiceClient(conn)
 	app.GRPCClient = client
 
-	// //init web
+	// //init helpers
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
+	handlers.NewHelpers(&app)
 	render.NewRenderer(&app)
+
 	srv := &http.Server{
 		Addr:    port,
 		Handler: routes(&app),
