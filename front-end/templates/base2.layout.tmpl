@@ -1,6 +1,6 @@
 {{define "base"}}
- {{/* use Websocket to communicate with the agent  */}}
 
+ {{/* use an API to communicate with the agent  */}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,27 +10,7 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <link href="/static/css/styles.css" rel="stylesheet" />
-  <style>
-    #chat-container {
-      max-height: 500px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
-      background: #f9f9f9;
-      margin-bottom: 10px;
-    }
-    .chat-row {
-      display: flex;
-      margin-bottom: 10px;
-    }
-    .user .message { background: #d1e7ff; margin-left: auto; }
-    .ai-message .message { background: #e2e3e5; margin-right: auto; }
-    .avatar { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #ccc; margin-right: 5px; }
-    .message { padding: 8px 12px; border-radius: 10px; max-width: 70%; }
-    .flash-info { color: #0c5460; background: #d1ecf1; padding: 5px; border-radius: 5px; margin-bottom: 5px; }
-    .flash-error { color: #721c24; background: #f8d7da; padding: 5px; border-radius: 5px; margin-bottom: 5px; }
-  </style>
+ <link href="/static/css/styles.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -43,7 +23,7 @@
 
     <div id="input-area">
       <textarea id="question" class="form-control" rows="2" placeholder="Type your question..."></textarea>
-      <button id="submit" class="btn btn-primary mt-2">Send</button>
+      <button id="submit" class="btn btn-primary">Send</button>
     </div>
 
     <div class="text-center text-muted">
@@ -66,12 +46,12 @@
       setTimeout(() => flashMessage.style.display = 'none', duration);
     }
 
-    function addMessage(text, type) {
+    function addMessage(text, type, timestamp = null) {
       const row = document.createElement('div');
       row.className = `chat-row ${type === 'user-message' ? 'user' : ''}`;
 
       const avatar = document.createElement('div');
-      avatar.className = 'avatar';
+      avatar.className = `avatar ${type === 'user-message' ? 'user-avatar' : 'ai-avatar'}`;
       avatar.innerHTML = type === 'user-message' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
 
       const msg = document.createElement('div');
@@ -81,42 +61,28 @@
       content.className = 'content';
       content.innerHTML = text;
 
+      const ts = document.createElement('div');
+      ts.className = 'timestamp';
+      ts.innerText = timestamp || new Date().toLocaleTimeString();
+
       msg.appendChild(content);
-      row.appendChild(type === 'user-message' ? msg : avatar);
-      row.appendChild(type === 'user-message' ? avatar : msg);
+      msg.appendChild(ts);
+
+      if (type === 'user-message') {
+        row.appendChild(msg);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(msg);
+      }
 
       chatContainer.appendChild(row);
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      return content; // return for typing effect updates
+      return content; // for updating text dynamically
     }
 
-    // --- WebSocket setup ---
-    const socket = new WebSocket("ws://localhost:4000/ws-answer-user-question");
-
-    socket.onopen = () => console.log("WebSocket connected");
-    socket.onclose = () => console.log("WebSocket closed");
-    socket.onerror = (err) => console.error("WebSocket error:", err);
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.action === "answer") {
-          // typing effect
-          const contentDiv = addMessage("", "ai-message");
-          let i = 0;
-          const interval = setInterval(() => {
-            contentDiv.innerText = data.message.slice(0, i);
-            i++;
-            if (i > data.message.length) clearInterval(interval);
-          }, 20);
-        }
-      } catch (err) {
-        console.error("Invalid JSON from server:", event.data);
-      }
-    };
-
-    function sendQuestion() {
+    async function sendQuestion() {
       const question = questionInput.value.trim();
       if (!question) return;
 
@@ -126,21 +92,57 @@
       addMessage(question, 'user-message');
       questionInput.value = '';
 
-      // send payload via WebSocket
-      const payload = { action: "question", message: question };
-      socket.send(JSON.stringify(payload));
+      const thinkingContent = addMessage(
+        'AI is typing... <span class="spinner-border spinner-border-sm"></span>',
+        'ai-message'
+      );
 
-      // temporary feedback
-      addMessage('AI is typing... <span class="spinner-border spinner-border-sm"></span>', 'ai-message');
+      // Show "still thinking" flash message if API takes >5 seconds
+      const waitingTimer = setTimeout(() => {
+        showFlash("Still thinking... thanks for your patience!", 4000, 'info');
+      }, 5000);
 
-      setTimeout(() => {
+      try {
+        const res = await fetch('http://localhost:4000/answer-user-question', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        clearTimeout(waitingTimer); // stop waiting flash if response received
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const json = await res.json();
+        let answer = 'No answer returned.';
+
+        if (json.error) {
+          showFlash(json.message || 'An error occurred!', 3000, 'error');
+          thinkingContent.innerHTML = 'Error encountered.';
+        } else if (json.data?.answer) {
+          answer = json.data.answer;
+          thinkingContent.innerHTML = '';
+          let i = 0;
+          const interval = setInterval(() => {
+            thinkingContent.innerText = answer.slice(0, i);
+            i++;
+            if (i > answer.length) clearInterval(interval);
+          }, 20);
+        }
+
+      } catch (err) {
+        clearTimeout(waitingTimer);
+        showFlash('Network error: ' + err.message, 3000, 'error');
+        thinkingContent.innerText = 'Error encountered.';
+      } finally {
         questionInput.disabled = false;
         submitButton.disabled = false;
         questionInput.focus();
-      }, 100); // quickly restore input
+      }
     }
 
     submitButton.onclick = sendQuestion;
+
     questionInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
