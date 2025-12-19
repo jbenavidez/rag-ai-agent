@@ -81,3 +81,5 @@ The main objective of the emergency technology infrastructure upgrade is to enha
 <img width="978" height="1014" alt="eg1" src="https://github.com/user-attachments/assets/82932ef4-d014-41c1-8f32-652fccd09a5c" />
 
 
+### TODO Next:
+Update Ollama 2 to Ollama 3 
